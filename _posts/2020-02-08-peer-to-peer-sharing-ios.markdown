@@ -4,9 +4,22 @@ title:  "Sharing between iOS apps via peer wifi"
 date:   2020-02-08 18:24:35 +1100
 categories: iOS iPadOS iPad Network.framework
 ---
-A very exciting blog about peer-to-peer wifi sharing for iOS apps.
+Adopting Network.framework for peer-to-peer device connectivity.
 
-To add new posts, simply add a file in the `_posts` directory that follows the convention `YYYY-MM-DD-name-of-post.ext` and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.
+Apple introduced the [Multipeer Connectivity][multipeer-connectivity] framework way back in 2013. This unheralded framework allows discovery of other nearby devices and exchange of data using peer-to-peer connectivity. For iOS, this would be via Wi-Fi networks, peer-to-peer Wi-Fi and Bluetooth.
+
+At Qantas we have been using this framework for peer-to-peer sharing of flight Nav Log entries between the pilot iPads during flight. 
+
+In our use-case, during a flight pilots are required to make entries in the Nav Log, for both regulatory audit purposes and also to review progress and fuel consumption against the original flight plan. For long-haul flights, two pilots will be on duty at a time, and a shift change mid-flight will require all the Nav Log entries to be shared with the incoming crew.
+
+Without a reliable satellite connection, client-to-server syncing to exchange data between devices is not possible.
+
+*Problems with the Multipeer Connectivity framework*
+
+Bloah
+
+
+
 
 Jekyll also offers powerful support for code snippets:
 
@@ -16,8 +29,6 @@ class MultipeerSession {
 }
 {% endhighlight %}
 
-Check out the [Jekyll docs][jekyll-docs] for more info on how to get the most out of Jekyll. File all bugs/feature requests at [Jekyll’s GitHub repo][jekyll-gh]. If you have questions, you can ask them on [Jekyll Talk][jekyll-talk].
+X.
 
-[jekyll-docs]: https://jekyllrb.com/docs/home
-[jekyll-gh]:   https://github.com/jekyll/jekyll
-[jekyll-talk]: https://talk.jekyllrb.com/
+[multipeer-connectivity]: https://developer.apple.com/documentation/multipeerconnectivity
