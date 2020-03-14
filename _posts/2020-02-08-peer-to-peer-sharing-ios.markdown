@@ -614,12 +614,19 @@ class p2pshareTests: XCTestCase {
         XCTAssertEqual(result!.count, 1)
         XCTAssertEqual(result![0].info["name"], "Jony")
     }
-
-    // and so on ..
 }
 {% endhighlight %}
 
+This example shows a basic "can we connect?" scenario.
 
+We can also use this approach to test that we can 
+* connect to multiple peers
+* ensure connections are only established when authentication is valid
+* restore lost connections
+* exchange of Codable data
+* build higher level tests based on business logic
+
+These tests could be considered integration tests, and will run take time to run. However, I think they are invaluable for having confidence in the higher-level business logic that you will wrap around peer-to-peer connectivity, which invariably will become quite complex. I guess that's why third-party SDKs like [Ditto][ditto] exist.
 
 [multipeer-connectivity]: https://developer.apple.com/documentation/multipeerconnectivity
 [wwdc-2019-advanced-networking]: https://developer.apple.com/videos/play/wwdc2019/713/
@@ -628,3 +635,4 @@ class p2pshareTests: XCTestCase {
 [nwlistener]: https://developer.apple.com/documentation/network/nwlistener
 [nwbrowser]: https://developer.apple.com/documentation/network/nwbrowser
 [nwconnection]: https://developer.apple.com/documentation/network/nwconnection
+[ditto]: https://www.ditto.live
