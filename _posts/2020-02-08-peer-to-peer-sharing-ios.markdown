@@ -21,9 +21,9 @@ At WWDC 2019 Apple [presented a new way to do peer-to-peer sharing][wwdc-2019-ad
 So why a new framework?
 -----
 
-The previous Multipeer Connectivity framework was not without its problems. As the app could be backgrounded or the device move temporarily out of range, re-discovering lost connections was a source of pain. We wanted to give pilots a _seamless experience_—they should not have to monitor connections and manually re-establish them. Unfortunately, the Multipeer Connectivity framework abstracted a little too much away, resulting in a lack of visibility over what was going on.
+The previous Multipeer Connectivity framework was not without its problems. As the app could be backgrounded or the device move temporarily out of range, re-discovering lost connections was not without its problems. We wanted to give pilots a _seamless experience_—they should not have to monitor connections and manually re-establish them. Unfortunately, the Multipeer Connectivity framework abstracted a little too much away, resulting in a lack of visibility over what was going on under the hood.
 
-The new Network framework is being promoted by Apple as the recommended way of implementing your own networking—if URLSession is not enough for your needs. As URLSession has been updated to sit on top of Network framework, this makes sense. Perhaps one of the key motivators for this is a better security foundation, in addition to more visiblity to what's going on under the hood.
+The new Network framework is being promoted by Apple as the recommended way of implementing your own networking—if URLSession is not enough for your needs.
 
 In contrast to the Multipeer Connectivity framework, the Network framework will limit you to communicating via Wi-Fi networks and peer-to-peer Wi-Fi, **but not Bluetooth**. For modern iPads this should not be a problem.
 
@@ -257,7 +257,7 @@ Previously we glossed over the initialisation of the connection and listener obj
 
 We'll want secure connections so we'll use TLS 1.2 over TCP using a pre-shared key. You'll have to decide how each app will know the pre-shared key. In the WWDC 2019 example, a four digit code is shared between players of the game. This isn't practical for seamless connectivity, so get that key onto the device in another secure way. Just don't send it over the wire!
 
-The implementation here is pretty much a copy of the WWDC 2019 sample code. Yay for CryptoKit!
+The implementation here is pretty much a parrot of the WWDC 2019 sample code. Yay for CryptoKit!
 
 {% highlight swift %}
 
@@ -312,8 +312,6 @@ Who connects to whom?
 
 The browser will discover which of the other devices are advertising. 
 
-image here...
-
 However, if every device initiates a connection to the others, you'll end up with double the required connections!
 
 This is where the unique peer ID helps. Who-ever has the highest UUID can take the initative to establish the connection.
@@ -338,11 +336,11 @@ This is where the unique peer ID helps. Who-ever has the highest UUID can take t
 
 In a scenario with two devices, you'll end up with a host and a service connection.
 
-insert image
+![Two devices][two-devices]
 
 With three devices, you'll end up with one device hosting twice, one device connecting twice, and one doing both!
 
-insert image
+![Three devices][three-devices]
 
 <br/>
 
@@ -553,7 +551,7 @@ class MultipeerSession {
 
 This results in a fairly consistent "seamless connectivity" experience. No user intervention required!
 
-demo video???
+Test yourself by running the example project on multiple devices, then backgrounding or even terminating apps and starting again.
 
 <br/>
 
@@ -562,9 +560,9 @@ Unit Testing
 
 How do you unit test something that needs multiple devices to work?
 
-Normally such unit testing would be done by mocking out the dependencies - in this case the Network framework. However, it's generally not a great idea to mock out objects that you don't own, simply because you really don't know how they work, and so your unit tests are only really testing against your understanding of how the framework works.
+Normally such unit testing would be done by mocking out the dependencies - in this case the Network framework. However, it's generally not a great idea to mock out objects that you don't own, because you really don't know how they work, and so your unit tests are only really testing against your understanding of how the framework works.
 
-For this library, there is a better way! There is nothing stopping us from creating _multiple_ MultipeerSession objects, and communicating between them. That's possible thanks to the curious way that NWBrowser will return a list of discovered services.. including itself!
+However, there is nothing stopping us from creating _multiple_ MultipeerSession objects in the same app, and communicating between them. 
 
 On with the unit tests...
 
@@ -626,7 +624,9 @@ We can also use this approach to test that we can
 * exchange of Codable data
 * build higher level tests based on business logic
 
-These tests could be considered integration tests, and will run take time to run. However, I think they are invaluable for having confidence in the higher-level business logic that you will wrap around peer-to-peer connectivity, which invariably will become quite complex. I guess that's why third-party SDKs like [Ditto][ditto] exist.
+These tests could be considered integration tests, and will run take time to run. However, I think they are invaluable for having confidence in the higher-level business logic that you will wrap around peer-to-peer connectivity, which I promise you will become quite complex. I guess that's why third-party SDKs like [Ditto][ditto] exist.
+
+The full source code is available in [P2pShareKit][p2psharekit]
 
 [multipeer-connectivity]: https://developer.apple.com/documentation/multipeerconnectivity
 [wwdc-2019-advanced-networking]: https://developer.apple.com/videos/play/wwdc2019/713/
@@ -636,3 +636,6 @@ These tests could be considered integration tests, and will run take time to run
 [nwbrowser]: https://developer.apple.com/documentation/network/nwbrowser
 [nwconnection]: https://developer.apple.com/documentation/network/nwconnection
 [ditto]: https://www.ditto.live
+[p2psharekit]: https://github.com/dobster/P2PShareKit
+[two-devices]: /two-devices.png
+[three-devices]: /three-devices.png
