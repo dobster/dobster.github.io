@@ -21,7 +21,7 @@ At WWDC 2019 Apple [presented a new way to do peer-to-peer sharing][wwdc-2019-ad
 So why a new framework?
 -----
 
-The previous Multipeer Connectivity framework was not without its problems. As the app could be backgrounded or the device move temporarily out of range, re-discovering lost connections was not without its problems. We wanted to give pilots a _seamless experience_—they should not have to monitor connections and manually re-establish them. Unfortunately, the Multipeer Connectivity framework abstracted a little too much away, resulting in a lack of visibility over what was going on under the hood.
+The previous Multipeer Connectivity framework was not without its problems. As the app could be backgrounded or the device move temporarily out of range, re-discovering lost connections was problematic. We wanted to give pilots a _seamless experience_—they should not have to monitor connections and manually re-establish them. Unfortunately, the Multipeer Connectivity framework abstracted a little too much away, resulting in a lack of visibility over what was going on under the hood.
 
 The new Network framework is being promoted by Apple as the recommended way of implementing your own networking—if URLSession is not enough for your needs.
 
