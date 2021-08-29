@@ -10,20 +10,22 @@ categories: iOS iPadOS iPad Network.framework
 
 <br/>
 
-Apple introduced the [Multipeer Connectivity][multipeer-connectivity] framework back in 2013. This unheralded framework allows discovery of other nearby devices and exchange of data using peer-to-peer connectivity. For iOS, this would be via Wi-Fi networks, peer-to-peer Wi-Fi and Bluetooth. 
+Apple introduced the [Multipeer Connectivity][multipeer-connectivity] framework back in 2013. This unheralded framework provides discovery of other nearby devices and supports exchange of data using peer-to-peer connectivity. For iOS, this would be via Wi-Fi networks, peer-to-peer Wi-Fi and Bluetooth. 
 
-At Qantas, we have been using this framework for sharing of Navigation Log entries between the pilot iPads during flight. Without a reliable satellite connection, client-to-server syncing to exchange data between devices is not possible.
+At Qantas, we have been using this framework for sharing of Navigation Log entries between the pilot iPads during flight. Direct device-to-device sharing via peer-to-peer Wi-fi is ideal, as satellite internet is patchy and the onboard Wi-fi router is often overloaded and potentially insecure.
 
-At WWDC 2019 Apple [presented a new way to do peer-to-peer sharing][wwdc-2019-advanced-networking] using the relatively fresh [Network][network-framework] framework. This blog post will go through how we implemented this.
+At WWDC 2019 Apple [presented a new way to do peer-to-peer sharing][wwdc-2019-advanced-networking] using the relatively fresh [Network][network-framework] framework. This blog post will go through how we implemented peer-to-peer connectivity using the Network framework.
 
 <br/>
 
-So why a new framework?
+Why switch to the Network framework?
 -----
 
-The previous Multipeer Connectivity framework was not without its problems. As the app could be backgrounded or the device move temporarily out of range, re-discovering lost connections was problematic. We wanted to give pilots a _seamless experience_—they should not have to monitor connections and manually re-establish them. Unfortunately, the Multipeer Connectivity framework abstracted a little too much away, resulting in a lack of visibility over what was going on under the hood.
+The biggest challenge when providing peer-sharing is re-establishing connections after they have been lost. This will happen if the app is backgrounded, or the device is moves out of range. 
 
-The new Network framework is being promoted by Apple as the recommended way of implementing your own networking—if URLSession is not enough for your needs.
+We found that once the Multipeer Connectivity framework lost a connection, it was difficult to monitor this happening and automatically relocate and re-establish the connection. This necessitates building a user interface that allows users to monitor connections and manually re-establish them. This is not ideal, as we are aiming to provide pilots with a seamless experience, so they can focus on the task of completing the navigation log, rather than verifying data has transferred to their copilots.
+
+In discussions with Apple Engineers at WWDC2019, it was recommended we adopt the Network framework for reliable device-to-device connectivity. Where-as the Multipeer Connectivity framework abstracts things away, the Network framework gives access to what is going on under the hood.
 
 In contrast to the Multipeer Connectivity framework, the Network framework will limit you to communicating via Wi-Fi networks and peer-to-peer Wi-Fi, **but not Bluetooth**. For modern iPads this should not be a problem.
 
@@ -39,11 +41,11 @@ The Network framework provides us with two discovery classes:
 And finally
 - An [NWConnection][nwconnection] object which is the connection you establish with the other device.
 
-Let's go through how to set this up. We'll start by building wrappers around the NWListener and NWBrowser objects, as per the sample code from WWDC2019. The wrappers will let us manage the NWListener and NWBrowser objects which may need to be recreated under some situations.
+Let's go through how to set this up. We'll start by building wrappers around the NWListener and NWBrowser objects, as per the sample code from WWDC2019. The wrappers will let us manage the NWListener and NWBrowser objects, which may need to be recreated under some situations.
 
 We'll configure our listener with a bonjour service name (essentially our private peer-to-peer Wi-Fi network) and a pre-shared key for security that we'll cover later. 
 
-We'll also need a UUID to uniquely identify each other when there are multiple peers around to connect to. This UUID will also be handy when establishing who initiates a connection.
+We'll also need a UUID to uniquely identify each other when there are multiple peers around to connect to. This UUID will also be handy when establishing who is to initiate a connection.
 
 {% highlight swift %}
 class PeerListener {
@@ -180,7 +182,7 @@ class PeerConnection {
 }
 {% endhighlight %}
 
-Using these wrapper classes enable a fairly straight forward session management class which will manage a list of "active peers" (as distinct from connections which may or may not be ready and communicating). This level of abstraction makes reasoning a lot easier for the rest of your app which shouldn't need to worry about the current connection state.
+Using these wrapper classes enable straight forward session management class which will manage a list of "active peers" (as distinct from connections which may or may not be ready and communicating). This level of abstraction makes reasoning a lot easier for the rest of your app, which shouldn't need to worry about the current connection state.
 
 We'll also add callback closures at this level, which will help with unit testing later.
 
@@ -257,7 +259,7 @@ Previously we glossed over the initialisation of the connection and listener obj
 
 We'll want secure connections so we'll use TLS 1.2 over TCP using a pre-shared key. You'll have to decide how each app will know the pre-shared key. In the WWDC 2019 example, a four digit code is shared between players of the game. This isn't practical for seamless connectivity, so get that key onto the device in another secure way. Just don't send it over the wire!
 
-The implementation here is pretty much a parrot of the WWDC 2019 sample code. Yay for CryptoKit!
+The implementation here is lifted from the WWDC 2019 sample code, and uses CyptoKit.
 
 {% highlight swift %}
 
@@ -314,7 +316,7 @@ The browser will discover which of the other devices are advertising.
 
 However, if every device initiates a connection to the others, you'll end up with double the required connections!
 
-This is where the unique peer ID helps. Who-ever has the highest UUID can take the initative to establish the connection.
+This is where the unique peer ID helps. Who-ever has the highest UUID can take the initiative to establish the connection.
 
 {% highlight swift %}
  /// Should connect to a discovered service?
@@ -347,7 +349,7 @@ With three devices, you'll end up with one device hosting twice, one device conn
 Exchanging data
 ---
 
-The Network framework is suprisingly primitive in dealing with transfer of data. The WWDC 2019 Advanced Network 2 presentation walks through creating an elaborate transfer protocol specific to the demoed "TicTacToe" application. We can simplify things by implementing a basic Type-Length-Message protocol as described, but letting the users of our MultipeerSession object to exchange Codable structs on their own terms. Much saner and simpler!
+The Network framework is suprisingly primitive when dealing with transfer of data. The WWDC 2019 Advanced Network 2 presentation walks through creating an elaborate transfer protocol specific to the demoed "TicTacToe" application. We can simplify things by implementing a basic Type-Length-Message protocol as described, but letting the users of our MultipeerSession object to exchange Codable structs on their own terms. Much saner and simpler!
 
 {% highlight swift %}
 
@@ -447,7 +449,7 @@ struct PeerShareData: Codable {
 Seamless Connectivity
 ---
 
-Several scenarios will cause havoc with peer-to-peer Wi-Fi, and this is where our own MultipeerSession object can come into its own.
+Several scenarios will cause connectivity issues with peer-to-peer Wi-Fi, and this is where our own MultipeerSession object can come into its own.
 
 The first messy situation is when the app is backgrounded and we want to shut down the connection. When the app resumes in the foreground we'll want to re-establish connections.
 
@@ -477,7 +479,7 @@ class MultipeerSession {
     }
 {% endhighlight %}
 
-The second scenario is failing or flaky connections. Despite configuring the TCP keep-alive to 2 seconds, observations suggest failed connections can linger for a while, which does not result in a good user experience.
+The second scenario is failing or flaky connections. Despite configuring the TCP keep-alive to 2 seconds, observations suggest failed connections can linger for minutes, which does not result in a good user experience.
 
 One solution is to add a higher level "keep-alive", which periodically checks connections with a ping, and aggressively terminates failing connections, allowing them to be re-established. If someone out there can manage to achieve this level of reliability at the TCP level, please let me know!
 
@@ -549,7 +551,7 @@ class MultipeerSession {
 }
 {% endhighlight %}
 
-This results in a fairly consistent "seamless connectivity" experience. No user intervention required!
+This results in a fairly consistent "seamless connectivity" experience, with no user intervention required.
 
 Test yourself by running the example project on multiple devices, then backgrounding or even terminating apps and starting again.
 
