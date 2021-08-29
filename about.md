@@ -22,4 +22,4 @@ Previously at Commonwealth Bank and Westpac, crafting retail mobile banking apps
 
 [linkedin](https://www.linkedin.com/in/studobbie/)
 
-[quolldesigns.com](https://quolldesigns.com)
+[quolldesigns.com](http://quolldesigns.com)
