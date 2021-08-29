@@ -8,7 +8,7 @@ permalink: /about/
 
 **Stuart Dobbie**
 
-iOS Developer, Apple fanboi, coding nerd.
+*iOS Developer, Apple fanboi, coding nerd.*
 
 -
 
