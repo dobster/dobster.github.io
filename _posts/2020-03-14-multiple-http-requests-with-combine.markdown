@@ -7,7 +7,7 @@ categories: iOS iPadOS URLSession Combine.framework
 
 <br/>
 
-A common challenge for mobile development when faced with less-than-ideal backend API services is dealing with multiple endpoints that deliver heterogeneous data that you'd rather process as one single dataset.
+A common challenge for mobile development is dealing with multiple API endpoints that deliver heterogeneous data that you'd rather process as one single dataset.
 
 This may arise for many reasons including
 * you don't want to proceed unless you have all the data
@@ -53,20 +53,20 @@ if !errors.isEmpty {
 }
 {% endhighlight %}
 
-Not too bad if we're just waiting for two requests, but the mess of juggling of responses and errors doesn't scale nicely when we inevitably end up with five or six endpoints we need to coordinate.
+Not too bad if we're just waiting for two requests, but the mess of juggling of responses and errors does not scale nicely when we inevitably end up with five or six endpoints that we need to coordinate.
 
-One of the highlights of WWDC 2019 was the introduction of the functional-reactive framework [Combine][combine-framework], and in the [Advanced Networking 1 session at WWDC2019][wwdc-2019-advanced-networking] session, it was introduced as..
+One of the highlights at WWDC 2019 was the introduction of the [Combine][combine-framework] framework. The session [Advanced Networking 1 session at WWDC2019][wwdc-2019-advanced-networking] session starts with...
 
 > Networking is inherently asynchronous, that's why it's perfect to adopt Combine.
 
-So, how would we use Combine for this problem?
+Can we use Combine for this problem?
 
 <br/>
 
 Coordinating multiple requests with Combine
 -----
 
-The Combine extension to URLSession is particularly neat as it handles the error cases very nicely.
+The Combine extension to URLSession is particularly neat as it handles the error cases nicely.
 
 {% highlight swift %}
 let dataTask1 = URLSession.shared
@@ -94,7 +94,7 @@ A simple `zip()` does the trick!
 
 This method scales well when you have many requests to coordinate.
 
-Of course, it's no substitution for sorting out your backend APIs... 😀
+Of course, you could also just sort out your backend APIs... 😀
 
 [wwdc-2019-advanced-networking]: https://developer.apple.com/videos/play/wwdc2019/713/
 [combine-framework]: https://developer.apple.com/documentation/combine
