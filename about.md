@@ -4,15 +4,11 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
+iOS Developer, Apple fanboi, coding nerd
 
-You can find the source code for Minima at GitHub:
-[jekyll][jekyll-organization] /
-[minima](https://github.com/jekyll/minima)
+Currently at Qantas, building and supporting an EFB application for the iPad that is used and loved by pilots.
+Previously at Commonwealth Bank and Westpac, crafting retail mobile banking apps.
 
-You can find the source code for Jekyll at GitHub:
-[jekyll][jekyll-organization] /
-[jekyll](https://github.com/jekyll/jekyll)
-
-
-[jekyll-organization]: https://github.com/jekyll
+[github](https://github.com/dobster)
+[linkedin](https://www.linkedin.com/in/studobbie/)
+[quolldesigns.com](https://quolldesigns.com)
